@@ -1,0 +1,5 @@
+{
+  "db": "mongodb://localhost/productscrud",
+  "atlas": "mongodb+srv://admin:irl6VxwQ5y2ADN81@cluster0.aaeee.mongodb.net/?retryWrites=true&w=majority",
+ "jwtPrivateKey":"PrivateKey"
+}
