@@ -45,14 +45,30 @@ router.get("/:id", async (req, res) => {
 //   return res.send(products);
 // });
 
-router.put("/:id", validateProduct, auth, admin, async (req, res) => {
-  console.log("in put methd")
+// router.put("/:id", /*validateProduct, auth, admin*/  async (req, res) => {
+//   console.log("in put methd")
+//   console.log(req.body);
+//   let products = await Product.findById(req.params.id);
+ 
+//   products.name = req.body.name;
+//   products.price = req.body.price;
+//   // products.image = req.file.imagenp;
+//   await products.save();
+//   return res.send(products);
+// });
+
+router.put("/:id", upload.single("image"), async (req, res) => {
+  console.log("in put methd");
   console.log(req.body);
   let products = await Product.findById(req.params.id);
- 
+
   products.name = req.body.name;
   products.price = req.body.price;
-  products.image = req.file.imagenp;
+  if(req.file){
+    products.image = req.file.filename;
+    products.imagePath = req.file.path;    
+  }
+  // products.image = req.file.imagenp;
   await products.save();
   return res.send(products);
 });
@@ -62,8 +78,13 @@ router.delete("/:id",  auth,admin, async (req, res) => {
   return res.send(products);
 });
 
-router.post("/", upload.single("image"), validateProduct,auth,  async (req, res) => {
+router.post("/", upload.single("image"), /*validateProduct,auth,*/  async (req, res) => {
   console.log(req.file);
+  if(!req.body.name && !req.body.price && !req.file) return res.status(400).send("enter valid details");
+  if(!req.file) return res.status(400).send("enter product image");
+  if(!req.body.name) return res.status(400).send("enter product name");
+  if(!req.body.price) return res.status(400).send("enter product price");
+
   let products = new Product();
   products.name = req.body.name;
   products.price = req.body.price;
