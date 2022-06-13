@@ -35,43 +35,55 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-// router.put("/:id", validateProduct, auth, admin, async (req, res) => {
-//   let products = await Product.findById(req.params.id);
-//   console.log(req.body.name);
-//   products.name = req.body.name;
-//   products.price = req.body.price;
-//   // products.image = req.file.image;
-//   await products.save();
-//   return res.send(products);
-// });
-
-// router.put("/:id", /*validateProduct, auth, admin*/  async (req, res) => {
-//   console.log("in put methd")
-//   console.log(req.body);
-//   let products = await Product.findById(req.params.id);
- 
-//   products.name = req.body.name;
-//   products.price = req.body.price;
-//   // products.image = req.file.imagenp;
-//   await products.save();
-//   return res.send(products);
-// });
-
 router.put("/:id", upload.single("image"), async (req, res) => {
   console.log("in put methd");
   console.log(req.body);
+  try {
   let products = await Product.findById(req.params.id);
-
-  products.name = req.body.name;
-  products.price = req.body.price;
+  if(!req.body.name) {
+    products.name = req.body.name;
+  }
+  if(!req.body.price) {
+    products.price = req.body.price;
+  }
   if(req.file){
     products.image = req.file.filename;
     products.imagePath = req.file.path;    
   }
+  products.name = req.body.name;
+  products.price = req.body.price; }
+  catch(err) {
+    return res.status(400).send("invalid product detials");
+  }
+ 
+  
   // products.image = req.file.imagenp;
   await products.save();
   return res.send(products);
 });
+//working
+// router.put("/:id", upload.single("image"), async (req, res) => {
+//   console.log("in put methd");
+//   console.log(req.body);
+//   let products = await Product.findById(req.params.id);
+//   if(!req.body.name) {
+//     products.name = req.body.name;
+//   }
+//   if(!req.body.price) {
+//     products.price = req.body.price;
+//   }
+//   if(req.file){
+//     products.image = req.file.filename;
+//     products.imagePath = req.file.path;    
+//   }
+//   products.name = req.body.name;
+//   products.price = req.body.price;
+ 
+  
+//   // products.image = req.file.imagenp;
+//   await products.save();
+//   return res.send(products);
+// });
 
 router.delete("/:id",  auth,admin, async (req, res) => {
   let products = await Product.findByIdAndDelete(req.params.id);
