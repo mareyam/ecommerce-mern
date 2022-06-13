@@ -6,6 +6,8 @@ const multer = require("multer");
 const auth = require("../../middlewares/auth");
 const admin = require("../../middlewares/admin");
 
+//no cb function so its null
+//another function
 
 const Storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -36,7 +38,7 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-router.put("/:id", upload.single("image"), async (req, res) => {
+router.put("/:id", upload.single("image"),auth,admin, async (req, res) => {
   console.log("in put methd");
   console.log(req.body);
   try {
@@ -64,6 +66,32 @@ router.put("/:id", upload.single("image"), async (req, res) => {
   // products.image = req.file.imagenp;
  
 });
+
+router.delete("/:id",  auth,admin, async (req, res) => {
+  let products = await Product.findByIdAndDelete(req.params.id);
+  return res.send(products);
+});
+
+router.post("/", upload.single("image"), validateProduct,auth,admin,  async (req, res) => {
+  console.log(req.file);
+  if(!req.body.name && !req.body.price && !req.file) return res.status(400).send("enter valid details");
+  if(!req.file) return res.status(400).send("enter product image");
+  if(!req.body.name) return res.status(400).send("enter product name");
+  if(!req.body.price) return res.status(400).send("enter product price");
+
+  let products = new Product();
+  products.name = req.body.name;
+  products.price = req.body.price;
+  products.image = req.file.filename;
+  products.imagePath = req.file.path;
+  await products.save();
+  return res.send(products);
+});
+
+module.exports = router;
+
+
+
 //working
 // router.put("/:id", upload.single("image"), async (req, res) => {
 //   console.log("in put methd");
@@ -88,25 +116,3 @@ router.put("/:id", upload.single("image"), async (req, res) => {
 //   return res.send(products);
 // });
 
-router.delete("/:id",  auth,admin, async (req, res) => {
-  let products = await Product.findByIdAndDelete(req.params.id);
-  return res.send(products);
-});
-
-router.post("/", upload.single("image"), /*validateProduct,auth,*/  async (req, res) => {
-  console.log(req.file);
-  if(!req.body.name && !req.body.price && !req.file) return res.status(400).send("enter valid details");
-  if(!req.file) return res.status(400).send("enter product image");
-  if(!req.body.name) return res.status(400).send("enter product name");
-  if(!req.body.price) return res.status(400).send("enter product price");
-
-  let products = new Product();
-  products.name = req.body.name;
-  products.price = req.body.price;
-  products.image = req.file.filename;
-  products.imagePath = req.file.path;
-  await products.save();
-  return res.send(products);
-});
-
-module.exports = router;
