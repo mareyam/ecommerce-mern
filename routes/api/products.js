@@ -26,6 +26,7 @@ router.get("/", async (req, res) => {
 
 router.get("/:id", async (req, res) => {
   try {
+    console.log("Requeested")
     let products = await Product.findById(req.params.id);
     if (!products)
       return res.status(400).send("product with given id not present");
@@ -51,15 +52,17 @@ router.put("/:id", upload.single("image"), async (req, res) => {
     products.imagePath = req.file.path;    
   }
   products.name = req.body.name;
-  products.price = req.body.price; }
+  products.price = req.body.price; 
+  await products.save();
+  return res.send(products);
+}
   catch(err) {
     return res.status(400).send("invalid product detials");
   }
  
   
   // products.image = req.file.imagenp;
-  await products.save();
-  return res.send(products);
+ 
 });
 //working
 // router.put("/:id", upload.single("image"), async (req, res) => {
